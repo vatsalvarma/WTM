@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route } from 'react-router-dom';
 import Registration from './pages/Registration';
 import Admin from './pages/Admin';
 import { useEffect } from 'react';
@@ -34,7 +34,7 @@ function App() {
   }, []);
 
   return (
-    <Router basename="/WTM/">
+    <Router>
       <Routes>
         <Route path="/" element={<Registration />} />
         <Route path="/admin" element={<Admin />} />
