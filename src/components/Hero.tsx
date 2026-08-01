@@ -88,7 +88,7 @@ export default function Hero() {
               <div className="absolute bottom-0 right-0 border-b-2 border-r-2 border-[#D4AF37] draw-border z-20 rounded-br-3xl"></div>
 
               <div className="relative rounded-3xl overflow-hidden glass-card shadow-2xl group w-full max-w-lg mx-auto">
-                <img src="/artists_photo.png" alt="Artists" className="w-full h-[35vh] lg:h-[45vh] object-cover filter contrast-125 brightness-90 group-hover:scale-105 transition-transform duration-1000" />
+                <img src={`${import.meta.env.BASE_URL}artists_photo.png`} alt="Artists" className="w-full h-[35vh] lg:h-[45vh] object-cover filter contrast-125 brightness-90 group-hover:scale-105 transition-transform duration-1000" />
                 
                 {/* Logo Overlay */}
                 <div className="absolute top-4 left-0 right-0 flex flex-col items-center z-20 reveal-up">
