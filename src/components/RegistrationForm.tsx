@@ -63,6 +63,7 @@ export default function RegistrationForm() {
   const [step, setStep] = useState(1);
   const [ticketData, setTicketData] = useState<FormValues | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showQR, setShowQR] = useState(false);
   
   const { register, handleSubmit, control, formState: { errors }, trigger, watch } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -386,14 +387,48 @@ export default function RegistrationForm() {
             
             <div className="space-y-6">
               <div className="text-center">
-                <label className="block text-xs font-bold uppercase tracking-wider mb-4 text-gray-400">PAY USING UPI</label>
-                <div className="bg-white p-2 rounded-xl inline-block shadow-[0_0_30px_rgba(212,175,55,0.15)] mb-4">
-                  <img src={upiQr} alt="UPI QR Code" className="w-56 h-56 object-contain rounded-lg" />
+                <label className="block text-xs font-bold uppercase tracking-wider mb-4 text-gray-400">PAY ENTRY FEE (₹789)</label>
+                
+                <div className="flex flex-col gap-3 max-w-sm mx-auto mb-6">
+                  <a 
+                    href="phonepe://pay?pa=YOUR_UPI_ID@bank&pn=WhatTheMic&am=789&cu=INR" 
+                    className="bg-[#5f259f] hover:bg-[#4a1c7e] text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors"
+                  >
+                    Pay with PhonePe
+                  </a>
+                  <a 
+                    href="gpay://upi/pay?pa=YOUR_UPI_ID@bank&pn=WhatTheMic&am=789&cu=INR" 
+                    className="bg-white hover:bg-gray-100 text-gray-900 font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors border border-gray-300"
+                  >
+                    Pay with Google Pay
+                  </a>
+                  <button 
+                    type="button" 
+                    onClick={() => setShowQR(!showQR)} 
+                    className="bg-[#171717] border border-white/20 hover:border-[#D4AF37] text-white font-bold py-3 px-4 rounded-xl transition-all"
+                  >
+                    {showQR ? "Hide QR Code" : "Show QR Code (Scan to Pay)"}
+                  </button>
                 </div>
-                <p className="text-xs text-[#D4AF37] flex items-center justify-center gap-2 font-medium bg-[#D4AF37]/10 p-3 rounded-lg border border-[#D4AF37]/20 mx-auto max-w-md text-left md:text-center">
-                  <AlertCircle size={24} className="flex-shrink-0" />
-                  Scan to pay the organizer. You can also save this QR and upload it in your UPI app to pay. After paying, upload your screenshot below.
-                </p>
+
+                <AnimatePresence>
+                  {showQR && (
+                    <motion.div 
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="bg-white p-2 rounded-xl inline-block shadow-[0_0_30px_rgba(212,175,55,0.15)] mb-4 mt-2">
+                        <img src={upiQr} alt="UPI QR Code" className="w-56 h-56 object-contain rounded-lg" />
+                      </div>
+                      <p className="text-xs text-[#D4AF37] flex items-center justify-center gap-2 font-medium bg-[#D4AF37]/10 p-3 rounded-lg border border-[#D4AF37]/20 mx-auto max-w-md text-left md:text-center mb-4">
+                        <AlertCircle size={24} className="flex-shrink-0" />
+                        Scan to pay the organizer. You can also save this QR and upload it in your UPI app to pay.
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
               
               <div className="border-t border-white/10 pt-8 mt-8">
