@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Check, X, Search, Filter, Send, Loader2, ExternalLink, Download } from 'lucide-react';
+import { Check, X, Search, Filter, Send, Loader2, ExternalLink, Download, Lock } from 'lucide-react';
 
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzKRUokVBGc3Q_yhGnXnfE_teYQMDSm_yxs3EalZDBBX80EPpuE9FVxsf7_Lp4cUysSqw/exec';
 
@@ -25,6 +25,20 @@ export default function Admin() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [selectedRegistration, setSelectedRegistration] = useState<RegistrationData | null>(null);
+  
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [password, setPassword] = useState('');
+  const [authError, setAuthError] = useState(false);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password === 'wtmadmin123') {
+      setIsAuthenticated(true);
+    } else {
+      setAuthError(true);
+      setTimeout(() => setAuthError(false), 2000);
+    }
+  };
 
   useEffect(() => {
     fetch(SCRIPT_URL)
@@ -227,6 +241,63 @@ export default function Admin() {
     r.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     r.artistType.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-[#090909] flex items-center justify-center p-4 font-sans text-white">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+          className="glass-card p-8 md:p-10 max-w-md w-full relative overflow-hidden"
+        >
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[#D4AF37] to-transparent"></div>
+          
+          <div className="flex justify-center mb-6">
+            <div className="w-16 h-16 rounded-full bg-[#D4AF37]/10 flex items-center justify-center border border-[#D4AF37]/30">
+              <Lock className="text-[#D4AF37]" size={32} />
+            </div>
+          </div>
+          
+          <h2 className="text-2xl font-black uppercase text-center mb-2 tracking-widest">Admin Access</h2>
+          <p className="text-gray-400 text-center text-sm mb-8">Enter password to manage registrations</p>
+          
+          <form onSubmit={handleLogin}>
+            <div className="mb-6 relative">
+              <input 
+                type="password" 
+                placeholder="Password" 
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={`w-full bg-[#171717] border ${authError ? 'border-red-500' : 'border-white/10 focus:border-[#D4AF37]'} rounded-lg py-3 px-4 focus:outline-none transition-colors text-center text-lg tracking-widest`}
+              />
+              <AnimatePresence>
+                {authError && (
+                  <motion.p 
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="text-red-500 text-xs text-center mt-2 absolute w-full"
+                  >
+                    Incorrect password
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </div>
+            
+            <motion.button 
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              type="submit" 
+              className="w-full bg-[#D4AF37] hover:bg-[#b8952b] text-black font-bold py-3 px-4 rounded-lg uppercase tracking-wider transition-colors"
+            >
+              Access Dashboard
+            </motion.button>
+          </form>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#090909] p-4 md:p-10 font-sans text-white">
