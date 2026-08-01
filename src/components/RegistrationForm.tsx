@@ -19,7 +19,16 @@ const formSchema = z.object({
   
   artistType: z.string().min(1, "Select artist type"),
   setDetails: z.string().min(10, "Please provide some details about your set"),
-  dob: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Please select a complete date of birth"),
+  dob: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Please select a complete date of birth").refine(val => {
+    const dob = new Date(val);
+    const today = new Date();
+    let age = today.getFullYear() - dob.getFullYear();
+    const m = today.getMonth() - dob.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+      age--;
+    }
+    return age >= 21;
+  }, "Oops under age"),
   ageDeclaration: z.boolean().refine(val => val === true, "You must declare you are 21+"),
   
   upiTransactionId: z.string().min(5, "Transaction ID is required"),
