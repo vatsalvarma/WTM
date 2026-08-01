@@ -61,16 +61,7 @@ export default function Admin() {
     }
   };
 
-  const sendWhatsAppTicket = (reg: RegistrationData) => {
-    const message = `Hey *${reg.stageName}*! 🎉\n\nYour registration for *What the Mic 5.0* is APPROVED!\n\nHere are your Artist Pass details:\n- *Date:* 09 AUG 2026\n- *Time:* 3:00 PM\n- *Venue:* SKYHY LIVE\n- *Act:* ${reg.artistType}\n- *Txn ID:* ${reg.upiTransactionId}\n\nPlease bring a valid ID for venue entry. DO NOT SHARE this pass. See you at the stage! 🎤`;
-    const encodedMessage = encodeURIComponent(message);
-    // Remove any non-numeric characters from the WhatsApp number
-    const phone = reg.whatsapp.replace(/\D/g, '');
-    // Ensure it has country code (assuming India +91 if length is 10)
-    const formattedPhone = phone.length === 10 ? `91${phone}` : phone;
-    const whatsappUrl = `https://wa.me/${formattedPhone}?text=${encodedMessage}`;
-    window.open(whatsappUrl, '_blank');
-  };
+
   const generateAndShareTicket = async (reg: RegistrationData, actionType: 'share' | 'download' = 'share') => {
     try {
       document.body.style.cursor = 'wait';
@@ -432,7 +423,7 @@ export default function Admin() {
                     <div className="bg-black/30 p-4 rounded-xl space-y-3 border border-white/5">
                       <div><span className="text-gray-400 text-xs uppercase w-24 inline-block">Stage Name:</span> <span className="font-bold text-white text-lg">{selectedRegistration.stageName}</span></div>
                       <div><span className="text-gray-400 text-xs uppercase w-24 inline-block">Full Name:</span> <span className="text-gray-300">{selectedRegistration.fullName}</span></div>
-                      <div><span className="text-gray-400 text-xs uppercase w-24 inline-block">DOB:</span> <span className="text-gray-300">{selectedRegistration.dob}</span></div>
+
                     </div>
                   </div>
                   
