@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -64,8 +64,9 @@ export default function RegistrationForm() {
   const [ticketData, setTicketData] = useState<FormValues | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showQR, setShowQR] = useState(false);
+  const [isExtracting, setIsExtracting] = useState(false);
   
-  const { register, handleSubmit, control, formState: { errors }, trigger, watch } = useForm<FormValues>({
+  const { register, handleSubmit, control, formState: { errors }, trigger, watch, setValue } = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       artistType: '',
@@ -151,6 +152,25 @@ export default function RegistrationForm() {
   };
 
   const selectedFile = watch('paymentScreenshot');
+
+  useEffect(() => {
+    if (selectedFile && selectedFile.length > 0) {
+      setIsExtracting(true);
+      const file = selectedFile[0];
+      
+      import('tesseract.js').then(Tesseract => {
+        Tesseract.recognize(file, 'eng')
+          .then(({ data: { text } }) => {
+            const match = text.match(/\b\d{12}\b/);
+            if (match) {
+              setValue('upiTransactionId', match[0], { shouldValidate: true });
+            }
+          })
+          .catch(console.error)
+          .finally(() => setIsExtracting(false));
+      });
+    }
+  }, [selectedFile, setValue]);
 
   return (
     <div className="w-full">
@@ -434,12 +454,24 @@ export default function RegistrationForm() {
               <div className="border-t border-white/10 pt-8 mt-8">
                 <label className="block text-xs font-bold uppercase tracking-wider mb-2">PAYMENT SCREENSHOT <span className="text-red-500">*</span></label>
                 <div className="border-2 border-dashed border-white/20 rounded-xl p-10 flex flex-col items-center justify-center text-center hover:border-[#D4AF37]/50 hover:bg-white/5 transition-all cursor-pointer mb-4 relative overflow-hidden group">
-                  <input type="file" accept="image/*" {...register('paymentScreenshot')} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
-                  <Upload className={`mb-4 transition-colors ${selectedFile && selectedFile.length > 0 ? 'text-[#D4AF37]' : 'text-gray-400 group-hover:text-[#D4AF37]'}`} size={32} />
-                  <p className={`font-bold uppercase tracking-wider mb-1 text-sm transition-colors ${selectedFile && selectedFile.length > 0 ? 'text-[#D4AF37]' : 'group-hover:text-[#D4AF37]'}`}>
-                    {selectedFile && selectedFile.length > 0 ? selectedFile[0].name : "TAP TO CHOOSE YOUR SCREENSHOT"}
-                  </p>
-                  <p className="text-xs text-gray-500">PNG / JPG · SHOWING AMOUNT, DATE & TXN ID CLEARLY</p>
+                  <input type="file" accept="image/*" {...register('paymentScreenshot')} className="absolute inset-0 opacity-0 cursor-pointer z-10" disabled={isExtracting} />
+                  
+                  {isExtracting ? (
+                    <>
+                      <Loader2 className="mb-4 text-[#D4AF37] animate-spin" size={32} />
+                      <p className="font-bold uppercase tracking-wider mb-1 text-sm text-[#D4AF37]">
+                        READING TRANSACTION ID...
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className={`mb-4 transition-colors ${selectedFile && selectedFile.length > 0 ? 'text-[#D4AF37]' : 'text-gray-400 group-hover:text-[#D4AF37]'}`} size={32} />
+                      <p className={`font-bold uppercase tracking-wider mb-1 text-sm transition-colors ${selectedFile && selectedFile.length > 0 ? 'text-[#D4AF37]' : 'group-hover:text-[#D4AF37]'}`}>
+                        {selectedFile && selectedFile.length > 0 ? selectedFile[0].name : "TAP TO CHOOSE YOUR SCREENSHOT"}
+                      </p>
+                    </>
+                  )}
+                  <p className="text-xs text-gray-500 mt-2">PNG / JPG · SHOWING AMOUNT, DATE & TXN ID CLEARLY</p>
                 </div>
                 
                 <div>
