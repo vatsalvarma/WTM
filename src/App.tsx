@@ -34,7 +34,7 @@ function App() {
   }, []);
 
   return (
-    <Router>
+    <Router basename="/WTM/">
       <Routes>
         <Route path="/" element={<Registration />} />
         <Route path="/admin" element={<Admin />} />
